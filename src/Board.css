@@ -1,0 +1,18 @@
+.Board {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.Card-Pile {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-self: center;
+  width: 30%;
+  margin: 30vh auto;
+}
+.pull {
+  width:226px;
+  height: 314px;
+}

@@ -16,3 +16,12 @@
   width:226px;
   height: 314px;
 }
+
+.discarded {
+  width:226px;
+  height: 314px;
+}
+
+.Divider {
+  border-right: 2px solid black;
+}

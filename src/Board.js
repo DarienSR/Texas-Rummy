@@ -8,8 +8,7 @@ export default class Board extends Component {
   async setDeck() {
     const info = await this.getDeck();
     let arr = [];
-    console.log(info)
-    info.forEach(card => arr.push({value: card.value, suit: card.suit, image: card.image}));
+    info.forEach(card => arr.push({ value: card.value, suit: card.suit, image: card.image }));
     return arr;
   }
   
@@ -34,11 +33,12 @@ export default class Board extends Component {
       playerOneHand: [],
       playerTwoHand: []
     }
+    this.DiscardCard = this.DiscardCard.bind(this)
   }
 
   async componentDidMount() {
     const res = await this.setDeck();
-    let deck = res.map((card) => { return <Card suit={card.suit} value={card.value} image={card.image} /> })
+    let deck = res.map((card) => { return <Card id={`${card.value} ${card.suit}`} suit={card.suit} value={card.value} image={card.image} /> })
     let p1 = [];
     let p2 = [];
 
@@ -52,43 +52,62 @@ export default class Board extends Component {
     }
     // set deck to remaining cards
     this.setState({deck: deck, playerOneHand: p1, playerTwoHand: p2})
-    function shuffle(arr) {
-        for(let i = 0; i < 1000; i++) {
-          // generate two random numbers
-          let x = Math.floor(Math.random() * 52)
-          let y = Math.floor(Math.random() * 52)
-          // swap two random indexs in our dex.
-          let temp = arr[x];
-          arr[x] = arr[y];
-          arr[y] = temp;
-        }
-        return arr
-    }
   }
-
+  
   PullCard() {
     let card = this.state.deck.shift();
     this.setState({playerOneHand: [...this.state.playerOneHand, card]})
   }
 
+  DiscardCard(selected, id) {
+    let player, discarded, newPlayerHand;
+    if(id === 1) player = this.state.playerOneHand;
+    else         player = this.state.playerTwoHand;
+    
+    // loop through players hand, find card.
+    player.forEach((card, i) => {
+      if(card.props.id === selected) {
+        discarded = player.splice(i, 1);
+        newPlayerHand = player;
+      }
+    });
+
+    this.setState({[player]: newPlayerHand, discarded: [...this.state.discarded, discarded]})
+  }
+  
   render() {
     return (
       <div ClassName="Board">
         <div className="Card-Container">
-          <Player hand={this.state.playerTwoHand} />
+          <Player DiscardCard={this.DiscardCard} id={2} hand={this.state.playerTwoHand} />
         
           <div className="Card-Pile">
-            {this.state.deck[8]}
+            <div className="Discarded">
+             {this.state.discarded[this.state.discarded.length - 1]}
+            </div>
+            <div className="Divider"></div>
             <button onClick={() => this.PullCard()}>
               <img className="pull" src="https://i.pinimg.com/originals/11/45/96/11459640e599fd105943f5a379d25248.jpg" />
             </button>
             {/* <h2>Score</h2> */}
           </div>
 
-          <Player hand={this.state.playerOneHand} />
-          <button>Discard</button>
+          <Player DiscardCard={this.DiscardCard} id={1} hand={this.state.playerOneHand} />
         </div>
       </div>
     )
   }
+}
+
+function shuffle(arr) {
+    for(let i = 0; i < 1000; i++) {
+      // generate two random numbers
+      let x = Math.floor(Math.random() * 52)
+      let y = Math.floor(Math.random() * 52)
+      // swap two random indexs in our dex.
+      let temp = arr[x];
+      arr[x] = arr[y];
+      arr[y] = temp;
+    }
+    return arr
 }

@@ -4,24 +4,21 @@
   justify-content: center;
 }
 
-.Card-Pile {
+.PlayerHand {
   display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
-  align-self: center;
-  width: 30%;
-  margin: 5vh auto;
-}
-.pull {
-  width:226px;
-  height: 314px;
+  justify-content: center;
+  background-color: rgb(192, 192, 233);
 }
 
-.discarded {
-  width:226px;
-  height: 314px;
+.Board-Middle {
+  display: flex;
+  justify-content: center;
+  background-color: rgb(42, 42, 44);
 }
 
-.Divider {
-  border-right: 2px solid black;
+.Card {
+  padding: 2px;
+  margin: 5px;
+  height: 250px;
+  width: 175px;
 }

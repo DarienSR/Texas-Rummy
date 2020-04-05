@@ -1,11 +1,17 @@
 import React, { Component } from 'react'
-import "./Card.css";
+
 export default class Card extends Component {
+  toggleCard(selected) {
+    this.props.select(selected)
+  }
   render() {
     return (
-      <div className="Card">
-        <img id={this.props.id} alt={this.props.id} src={this.props.image} />
-      </div>
+      <img 
+        onClick={() => this.toggleCard(`${this.props.suit} ${this.props.value}`)} 
+        style={this.props.style}
+        className="Card" 
+        src={this.props.image} 
+      />
     )
   }
 }

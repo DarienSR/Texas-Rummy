@@ -64,6 +64,22 @@ let deck = [
 
 shuffle(deck)
 export default deck;
+export function StartGame(deck, p1Hand, p2Hand, discard) {
+  // Generate a shuffled deck (importing).
+  deck.forEach((card) => {
+    card.id = `${card.suit} ${card.value}`;
+  })
+  // deal 3 cards to each player
+  for(let i = 0; i < 3; i++) {
+    // pops card from top of the deck and puts it in players hand
+    p1Hand.push(deck.shift());
+    p2Hand.push(deck.shift());
+  }
+  // add one card to discard pile
+  discard.push(deck.shift());
+
+  return deck, p1Hand, p2Hand, discard;
+}
 
 function shuffle(arr) {
   for(let i = 0; i < 1000; i++) {

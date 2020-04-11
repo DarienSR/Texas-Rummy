@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
-import Deck from "./GetCards";
+import Deck, { StartGame } from "./GetCards";
 import Player from "./Player";
 import "./Board.css";
-
+import CheckIfOut from "./CheckIfOut";
+import { v4 as uuid } from 'uuid';
 export default class Board extends Component {
   constructor(props) {
     super(props)
@@ -16,6 +17,7 @@ export default class Board extends Component {
     }
     this.DiscardCard = this.DiscardCard.bind(this)
     this.OrganizeHand = this.OrganizeHand.bind(this)
+    this.Out = this.Out.bind(this)
   }
 
   componentDidMount() {
@@ -75,7 +77,7 @@ export default class Board extends Component {
   }
 
   OrganizeHand(increment, selected, id) {
-    let playerHand, player, discarded;
+    let playerHand, player;
 
     if(id === 1) {
       playerHand = "playerOneHand";
@@ -84,21 +86,44 @@ export default class Board extends Component {
       playerHand = "playerTwoHand";
       player = this.state.playerTwoHand;
     }
+    
+    if(increment === -1 || increment === 1) {
+      player.forEach((card, i) => {
+        if(card.id === selected) {
+          if(player[i+increment] === undefined) return;
+          let temp = player[i];
+          player[i] = player[i+increment]
+          player[i+increment] = temp;
+          return
+        }
+      });
+    } else {
+      player.forEach((card, i) => {
+        if(card.id === selected) {
+          if(player[i+1] === undefined) return;
+          if(increment === "|") {
+            if(player[i+1].type === "divider") return;
+            if(player[i].type === "divider") return;
+            let ranId = uuid();
+            player.splice(i+1, 0, {id: ranId, value: ranId, type: "divider"});
+          } else {
+            if(player[i].type !== "divider") return;
+            player.splice(i,1);
+          }
+        }
+      });
+    }
 
-    player.forEach((card, i) => {
-      if(card.id === selected) {
-        if(player[i+increment] === undefined) return;
-        console.log(selected, i, i+increment)
-        let temp = player[i];
-        player[i] = player[i+increment]
-        player[i+increment] = temp;
-        return
-      }
-    });
-    this.setState({[playerHand]: [...player]})
+    this.setState({[playerHand]: player})
   }
 
-
+  Out(id) {
+    if(id === 1) {
+      CheckIfOut(this.state.playerOneHand)
+    } else {
+      CheckIfOut(this.state.playerTwoHand)
+    }
+  }
 
   render() {
     return (
@@ -110,6 +135,7 @@ export default class Board extends Component {
             id={2} 
             hand={this.state.playerTwoHand} 
             OrganizeHand={this.OrganizeHand}
+            Out={this.Out}
           />
         </div>
 
@@ -130,6 +156,7 @@ export default class Board extends Component {
             id={1} 
             hand={this.state.playerOneHand} 
             OrganizeHand={this.OrganizeHand}
+            Out={this.Out}
           />
         </div>
       </div>
@@ -137,19 +164,3 @@ export default class Board extends Component {
   }
 }
 
-function StartGame(deck, p1Hand, p2Hand, discard) {
-  // Generate a shuffled deck (importing).
-  deck.forEach((card) => {
-    card.id = `${card.suit} ${card.value}`;
-  })
-  // deal 3 cards to each player
-  for(let i = 0; i < 3; i++) {
-    // pops card from top of the deck and puts it in players hand
-    p1Hand.push(deck.shift());
-    p2Hand.push(deck.shift());
-  }
-  // add one card to discard pile
-  discard.push(deck.shift());
-
-  return deck, p1Hand, p2Hand, discard;
-}

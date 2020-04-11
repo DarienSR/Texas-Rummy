@@ -7,6 +7,7 @@ export default class Card extends Component {
   render() {
     return (
       <img 
+        alt={this.props.value}
         onClick={() => this.toggleCard(`${this.props.suit} ${this.props.value}`)} 
         style={this.props.style}
         className="Card" 

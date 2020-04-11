@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import Deck from "./GetCards";
-import Card from "./Card";
 import Player from "./Player";
 import "./Board.css";
 
@@ -16,6 +15,7 @@ export default class Board extends Component {
       currentTurn: true
     }
     this.DiscardCard = this.DiscardCard.bind(this)
+    this.OrganizeHand = this.OrganizeHand.bind(this)
   }
 
   componentDidMount() {
@@ -24,13 +24,10 @@ export default class Board extends Component {
     this.setState({playerOneHand: p1Hand, playerTwoHand: p2Hand, discardPile: discard, deck: deck})
   }
 
-  PickUpCard() {
+  PickUpCard(fromDiscard) {
     if(this.state.hasPickedUp) return;
 
-    
-
-
-    let playerHand, player;
+    let playerHand, player, card;
     if(this.state.currentTurn) {
       playerHand = "playerOneHand";
       player = this.state.playerOneHand;
@@ -38,9 +35,14 @@ export default class Board extends Component {
       playerHand = "playerTwoHand";
       player = this.state.playerTwoHand;
     }
-
-    let card = this.state.deck.shift();
-    this.setState({[playerHand]: [...player, card], hasPickedUp: !this.state.hasPickedUp});
+    
+    if(fromDiscard) {
+      card = this.state.discardPile.pop();
+      this.setState({[playerHand]: [...player, card], hasPickedUp: !this.state.hasPickedUp, discardPile: [...this.state.discardPile]});
+    } else {
+      card = this.state.deck.shift();
+      this.setState({[playerHand]: [...player, card], hasPickedUp: !this.state.hasPickedUp});
+    }
   }
 
   DiscardCard(id, selected) {
@@ -59,11 +61,8 @@ export default class Board extends Component {
     }
     
     player.forEach((card, i) => {
-      if(card.id === selected) {
-        discarded = player.splice(i, 1);
-      }
+      if(card.id === selected) discarded = player.splice(i, 1);
     });
-      console.log(discarded)
 
     this.setState(
       {
@@ -75,21 +74,52 @@ export default class Board extends Component {
     )
   }
 
+  OrganizeHand(increment, selected, id) {
+    let playerHand, player, discarded;
+
+    if(id === 1) {
+      playerHand = "playerOneHand";
+      player = this.state.playerOneHand;
+    } else {
+      playerHand = "playerTwoHand";
+      player = this.state.playerTwoHand;
+    }
+
+    player.forEach((card, i) => {
+      if(card.id === selected) {
+        if(player[i+increment] === undefined) return;
+        console.log(selected, i, i+increment)
+        let temp = player[i];
+        player[i] = player[i+increment]
+        player[i+increment] = temp;
+        return
+      }
+    });
+    this.setState({[playerHand]: [...player]})
+  }
+
+
+
   render() {
     return (
       <div className="Board">
         <div>
           <Player 
             style={!this.state.currentTurn ? {backgroundColor: "orange"} : null} 
-            Discard={this.DiscardCard} id={2} 
-            hand={this.state.playerTwoHand} /
-          >
+            Discard={this.DiscardCard} 
+            id={2} 
+            hand={this.state.playerTwoHand} 
+            OrganizeHand={this.OrganizeHand}
+          />
         </div>
 
         <div className="Board-Middle">
-          <div>
-            <Card image={this.state.discardPile[0] ? this.state.discardPile[this.state.discardPile.length - 1].image : null} />
-          </div>
+          <button onClick={() => this.PickUpCard(true)} >
+            <img className="Card"
+              alt="Discard Pile"
+              src={this.state.discardPile[0] ? this.state.discardPile[this.state.discardPile.length - 1].image : null} 
+            />
+          </button>
           <button className="Card" onClick={() => this.PickUpCard()}></button>
         </div>
           
@@ -99,6 +129,7 @@ export default class Board extends Component {
             Discard={this.DiscardCard} 
             id={1} 
             hand={this.state.playerOneHand} 
+            OrganizeHand={this.OrganizeHand}
           />
         </div>
       </div>

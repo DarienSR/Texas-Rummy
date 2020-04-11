@@ -6,35 +6,50 @@ export default class Player extends Component {
     super(props)
   
     this.state = {
-      selected: ""
+      selected: "",
+      score: 0
     }
   }
   
-
   toggleDiscard() {
     this.props.Discard(this.props.id, this.state.selected);
+  }
+
+  handleOrganizeHand(increment) {
+    this.props.OrganizeHand(increment, this.state.selected, this.props.id)
   }
 
   selectCard(selected) {
     this.setState({selected: selected})
   }
-
+  
   render() {
     return (
-      <div>
-        <div style={this.props.style} className="PlayerHand">
+      <div>        
+        <div 
+        style={this.props.style} className="PlayerHand">
           {this.props.hand.map((card) => {
             return <Card 
+              className="Playercard"
               style={this.state.selected === card.id ? {borderBottom: "5px solid black"} : null}
               select={(x) => this.selectCard(x)} 
-              id={card.id} 
+              key={card.id} 
               suit={card.suit} 
               value={card.value} 
               image={card.image} 
             />
           })}
         </div>
-        <button onClick={() => this.toggleDiscard()}>Discard Card</button>
+
+        <div className="Player-Controls">
+          <button onClick={() => this.toggleDiscard()}>Discard Card</button>
+          
+          <button onClick={() => this.handleOrganizeHand(-1)}>left</button>
+          <button onClick={() => this.handleOrganizeHand(1)}>right</button>
+
+          <button>OUT</button>
+        </div>
+
       </div>
     )
   }

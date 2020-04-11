@@ -22,3 +22,17 @@
   height: 250px;
   width: 175px;
 }
+
+
+.Player-Controls {
+  display: flex;
+  justify-content: space-evenly;
+  margin: 1rem;
+}
+
+
+.Player-Controls button {
+  padding: 0.5rem;
+  background-color: rgb(221, 159, 159);
+  width: 150px;
+}

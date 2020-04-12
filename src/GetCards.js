@@ -64,13 +64,14 @@ let deck = [
 
 shuffle(deck)
 export default deck;
-export function StartGame(deck, p1Hand, p2Hand, discard) {
+export function StartGame(deck, p1Hand, p2Hand, discard, number) {
+
   // Generate a shuffled deck (importing).
   deck.forEach((card) => {
     card.id = `${card.suit} ${card.value}`;
   })
   // deal 3 cards to each player
-  for(let i = 0; i < 3; i++) {
+  for(let i = 0; i < parseInt(number); i++) {
     // pops card from top of the deck and puts it in players hand
     p1Hand.push(deck.shift());
     p2Hand.push(deck.shift());

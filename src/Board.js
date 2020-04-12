@@ -16,7 +16,7 @@ export default class Board extends Component {
       currentTurn: true,
       lastMove: false,
       resetRound: false,
-      currentWildCard: 3
+      currentWildCard: "6"
     }
     this.DiscardCard = this.DiscardCard.bind(this)
     this.OrganizeHand = this.OrganizeHand.bind(this)
@@ -25,13 +25,13 @@ export default class Board extends Component {
 
   componentDidMount() {
     let deck = Deck, p1Hand = [], p2Hand = [], discard = [];
-    StartGame(deck, p1Hand, p2Hand, discard);
+    StartGame(deck, p1Hand, p2Hand, discard, this.state.currentWildCard);
     this.setState({playerOneHand: p1Hand, playerTwoHand: p2Hand, discardPile: discard, deck: deck})
   }
 
   PickUpCard(fromDiscard) {
-    if(this.state.hasPickedUp) return;
-  
+    if(this.state.hasPickedUp || this.state.resetRound) return;
+    
     let playerHand, player, card;
     if(this.state.currentTurn) {
       playerHand = "playerOneHand";
@@ -134,10 +134,29 @@ export default class Board extends Component {
     } else {
       isValid = CheckIfOut(this.state.playerTwoHand, this.state.currentWildCard)
     }
-    if(isValid) {
+    if(isValid && !this.state.resetRound) {
+      alert()
       this.setState({lastMove: true})
     }
     console.log(isValid)
+  }
+
+  ResetRound() {
+    let number = parseInt(this.state.currentWildCard);
+    number++;
+    let deck = Deck, p1Hand = [], p2Hand = [], discard = [];
+    StartGame(deck, p1Hand, p2Hand, discard, number);
+    this.setState({
+      playerOneHand: p1Hand, 
+      playerTwoHand: p2Hand, 
+      discardPile: discard, 
+      deck: deck,
+      currentWildCard: number,
+      hasPickedUp: false,
+      currentTurn: true,
+      lastMove: false,
+      resetRound: false,
+    });
   }
 
   OverwriteCard() {
@@ -154,12 +173,13 @@ export default class Board extends Component {
 
     let playerHand = this.state.playerOneHand;
     playerHand[idx] = newCard
-    console.log(playerHand)
     this.setState({playerOneHand: playerHand})
   }
 
   render() {
-    if(this.state.resetRound) alert("RESETING, SCORING POINTS")
+    let nextRound;
+    if(this.state.resetRound) nextRound = <button onClick={() => this.ResetRound()}>NEXT ROUND</button>
+  
     return (
       <div className="Board">
         <div>
@@ -182,7 +202,7 @@ export default class Board extends Component {
           </button>
           <button className="Card" onClick={() => this.PickUpCard()}></button>
         </div>
-          
+        {nextRound}
         <div>
           <Player 
             style={this.state.currentTurn ? {backgroundColor: "orange"} : null} 
@@ -195,7 +215,6 @@ export default class Board extends Component {
         </div>
         <button onClick={() => this.OverwriteCard()}>OVERWRITE</button>
       </div>
-
     )
   }
 }

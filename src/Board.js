@@ -13,7 +13,10 @@ export default class Board extends Component {
       playerOneHand: [],
       playerTwoHand: [],
       hasPickedUp: false,
-      currentTurn: true
+      currentTurn: true,
+      lastMove: false,
+      resetRound: false,
+      currentWildCard: 3
     }
     this.DiscardCard = this.DiscardCard.bind(this)
     this.OrganizeHand = this.OrganizeHand.bind(this)
@@ -28,7 +31,7 @@ export default class Board extends Component {
 
   PickUpCard(fromDiscard) {
     if(this.state.hasPickedUp) return;
-
+  
     let playerHand, player, card;
     if(this.state.currentTurn) {
       playerHand = "playerOneHand";
@@ -50,7 +53,8 @@ export default class Board extends Component {
   DiscardCard(id, selected) {
     if(id === 1 && this.state.currentTurn === false) return;
     if(id === 2 && this.state.currentTurn === true) return;
-    if(!this.state.hasPickedUp) return;
+    if(!this.state.hasPickedUp || this.state.resetRound) return;
+    if(selected.length > 15) return; // we know this is a uuid, not a valid card
 
     let playerHand, player, discarded;
 
@@ -66,14 +70,20 @@ export default class Board extends Component {
       if(card.id === selected) discarded = player.splice(i, 1);
     });
 
-    this.setState(
-      {
-        [playerHand]: player, 
-        discardPile: [...this.state.discardPile, discarded[0]], 
-        hasPickedUp: !this.state.hasPickedUp, 
-        currentTurn: !this.state.currentTurn 
-      }
-    )
+    if(discarded === undefined) return;
+
+    if(!this.state.lastMove) {
+      this.setState(
+        {
+          [playerHand]: player, 
+          discardPile: [...this.state.discardPile, discarded[0]], 
+          hasPickedUp: !this.state.hasPickedUp, 
+          currentTurn: !this.state.currentTurn 
+        }
+      )
+    } else {
+      this.setState({[playerHand]: player, resetRound: true})
+    }
   }
 
   OrganizeHand(increment, selected, id) {
@@ -86,7 +96,7 @@ export default class Board extends Component {
       playerHand = "playerTwoHand";
       player = this.state.playerTwoHand;
     }
-    
+
     if(increment === -1 || increment === 1) {
       player.forEach((card, i) => {
         if(card.id === selected) {
@@ -94,22 +104,22 @@ export default class Board extends Component {
           let temp = player[i];
           player[i] = player[i+increment]
           player[i+increment] = temp;
-          return
+          return;
         }
       });
     } else {
       player.forEach((card, i) => {
         if(card.id === selected) {
+          let check = "divider", ranId = uuid();
           if(player[i+1] === undefined) return;
           if(increment === "|") {
-            if(player[i+1].type === "divider") return;
-            if(player[i].type === "divider") return;
-            let ranId = uuid();
+            if(player[i+1].type === check || player[i].type === check) return;
             player.splice(i+1, 0, {id: ranId, value: ranId, type: "divider"});
           } else {
-            if(player[i].type !== "divider") return;
+            if(player[i].type !== check) return;
             player.splice(i,1);
           }
+          return;
         }
       });
     }
@@ -118,14 +128,38 @@ export default class Board extends Component {
   }
 
   Out(id) {
+    let isValid;
     if(id === 1) {
-      CheckIfOut(this.state.playerOneHand)
+      isValid = CheckIfOut(this.state.playerOneHand, this.state.currentWildCard)
     } else {
-      CheckIfOut(this.state.playerTwoHand)
+      isValid = CheckIfOut(this.state.playerTwoHand, this.state.currentWildCard)
     }
+    if(isValid) {
+      this.setState({lastMove: true})
+    }
+    console.log(isValid)
+  }
+
+  OverwriteCard() {
+    let idx = prompt();
+    let value = prompt();
+    let suit = prompt();
+    let image = prompt();
+    let newCard = {
+      value: value,
+      suit: suit,
+      image: `./cards/${image}.png`,
+      id: `${suit} ${value}`
+    }
+
+    let playerHand = this.state.playerOneHand;
+    playerHand[idx] = newCard
+    console.log(playerHand)
+    this.setState({playerOneHand: playerHand})
   }
 
   render() {
+    if(this.state.resetRound) alert("RESETING, SCORING POINTS")
     return (
       <div className="Board">
         <div>
@@ -159,7 +193,9 @@ export default class Board extends Component {
             Out={this.Out}
           />
         </div>
+        <button onClick={() => this.OverwriteCard()}>OVERWRITE</button>
       </div>
+
     )
   }
 }

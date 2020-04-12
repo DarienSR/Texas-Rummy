@@ -24,7 +24,6 @@ export default class Player extends Component {
   }
   
   selectCard(selected) {
-    console.log(selected)
     this.setState({selected: selected})
   }
 

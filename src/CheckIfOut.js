@@ -1,24 +1,91 @@
 export default function CheckIfOut(hand, wildcard) {
-  const valueOrder = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
-  // loop through hand checking order. See if it matches conditions.
-  // create an array of arrays, seperate by divider.
+  const valueOrder = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "K", "Q"];
+
+  let subArr = [], start = 0
+
   for(let i = 0; i < hand.length - 1; i++) {
-    if(hand[i].type !== "divider" || hand !== undefined) {
-      if(hand[i].value === wildcard && hand[i].id === "SPADES 2" && hand[i].id === "CLUBS 2") {
-        if(hand[i].suit === hand[i+1].suit) {
-          // same suit
-          let compare = valueOrder.indexOf(hand[i].value);
-           
-          if(hand[i].value + hand[i+1].value !== valueOrder[compare] + valueOrder[compare+1]) return false;
-          // check if values are in correct order
-        } else {
-          // check if values are all different
-          if(hand[i].value !== hand[i+1].value) return false
+    // seperate by divider
+    if(hand[i].type === "divider") {
+      subArr.push(hand.slice(start, i))
+      start = i+1;  
+    }
+  }
+  
+  // push remaining
+  subArr.push(hand.slice(start, hand.length))
+  
+  for(let i = 0; i < subArr.length; i++) {
+    // create array with cards that do not have same suit as first card.
+    let check = subArr[i].every(card => card.suit === subArr[i][0].suit);
+  
+    if(check) {
+      console.log("run")
+      // we have a run
+      let count = 1;
+      for(let j = 0; j < subArr[i].length - 1; j++) {
+        if(subArr[i][count].value !== undefined) {
+          let checkIfWild = subArr[i][count].value === wildcard || subArr[i][count].id === "SPADES 2" || subArr[i][count].id === "CLUBS 2";
+          // finds card position in compare hand.
+          let compare = valueOrder.indexOf(subArr[i][j].value);
+          // find what the next card SHOULD BE
+          compare++;
+          
+  
+          if(checkIfWild) {
+            // next card is a wild card.
+            console.log("Wild Card Found", j)
+            subArr[i][count] = {value: valueOrder[compare]}
+          }
+  
+          // check next value
+          if(subArr[i][count].value !== valueOrder[compare] && checkIfWild === false) return false;
         }
+        console.log(subArr)
+        count++;
+      }
+    } else {
+      console.log("values")
+      // we are looking at the values
+  
+      let sameValues = subArr[i].every(card => card.value === subArr[i][0].value)
+  
+      if(!sameValues) {
+        // we want to filter out wild cards
+        let checkForWilds = subArr[i].filter(card => card.value !== wildcard)
+                                     .filter(card => card.id !== "SPADES 2")
+                                     .filter(card => card.id !== "CLUBS 2")
+                                     
+      checkForWilds = checkForWilds.every(card => card.value === subArr[i][0].value)
+      if(!checkForWilds) return false;                
       }
     }
   }
-  return true
+  return true;
+
+  // for(let i = 0; i < hand.length - 1; i++) {
+  //   let cardVal = hand[i].value;
+  //   let nextCard = hand[i+1];
+  //   if(hand[i].type !== "divider") {
+  //     // check if wild
+  //     let nextCardCheckIsWild = nextCard.value === wildcard || nextCard.id === "SPADES 2" || nextCard.id === "CLUBS 2"
+  //     if(cardVal === wildcard || hand[i].id === "SPADES 2" || hand[i].id === "CLUBS 2") {
+  //     } else {
+  //       if(hand[i].suit === nextCard.suit) {
+  //         // same suit, CHECK FOR RUN
+  //         let compare = valueOrder.indexOf(cardVal);
+           
+  //         if(cardVal + nextCard.value !== valueOrder[compare] + valueOrder[compare+1] 
+  //           && nextCardCheckIsWild === false && nextCard.type !== "divider") return false;
+
+  //         // check if values are in correct order
+  //       } else {
+  //         // if values are different, return. 
+  //         if(cardVal !== nextCard.value && nextCardCheckIsWild === false && nextCard.type !== "divider") return false
+  //       }
+  //     }
+  //   }
+  // }
+  // return true
 }
 
 

@@ -65,7 +65,7 @@ let deck = [
 shuffle(deck)
 export default deck;
 export function StartGame(deck, p1Hand, p2Hand, discard, number) {
-
+console.log(number)
   // Generate a shuffled deck (importing).
   deck.forEach((card) => {
     card.id = `${card.suit} ${card.value}`;

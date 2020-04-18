@@ -16,7 +16,8 @@ export default class Board extends Component {
       currentTurn: true,
       lastMove: false,
       resetRound: false,
-      currentWildCard: "6"
+      currentWildCard: "3",
+      currentHand: 3 // STARTING
     }
     this.DiscardCard = this.DiscardCard.bind(this)
     this.OrganizeHand = this.OrganizeHand.bind(this)
@@ -25,7 +26,7 @@ export default class Board extends Component {
 
   componentDidMount() {
     let deck = Deck, p1Hand = [], p2Hand = [], discard = [];
-    StartGame(deck, p1Hand, p2Hand, discard, this.state.currentWildCard);
+    StartGame(deck, p1Hand, p2Hand, discard, this.state.currentHand);
     this.setState({playerOneHand: p1Hand, playerTwoHand: p2Hand, discardPile: discard, deck: deck})
   }
 
@@ -134,24 +135,41 @@ export default class Board extends Component {
     } else {
       isValid = CheckIfOut(this.state.playerTwoHand, this.state.currentWildCard)
     }
-    if(isValid && !this.state.resetRound) {
-      alert()
+    if(isValid) {
       this.setState({lastMove: true})
     }
     console.log(isValid)
   }
 
   ResetRound() {
-    let number = parseInt(this.state.currentWildCard);
-    number++;
-    let deck = Deck, p1Hand = [], p2Hand = [], discard = [];
+    let number = this.state.currentHand;
+    let deck = Deck, p1Hand = [], p2Hand = [], discard = [], wild;
+    number++
     StartGame(deck, p1Hand, p2Hand, discard, number);
+    
+    switch(number) {
+      case 11:
+        wild = "J";
+        break;
+      case 12:
+        wild = "K";
+        break;
+      case 13: 
+        wild = "Q"
+        break;
+      case wild >= 14:
+        wild = "GAME FINISHED"
+        break;
+      default:
+        break;
+    }
     this.setState({
       playerOneHand: p1Hand, 
       playerTwoHand: p2Hand, 
       discardPile: discard, 
       deck: deck,
-      currentWildCard: number,
+      currentWildCard: wild,
+      currentHand: number,
       hasPickedUp: false,
       currentTurn: true,
       lastMove: false,

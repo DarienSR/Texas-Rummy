@@ -23,7 +23,8 @@ export default function CheckIfOut(hand, wildcard) {
       // we have a run
       let count = 1;
       for(let j = 0; j < subArr[i].length - 1; j++) {
-        if(subArr[i][count].value !== undefined) {
+       let checkCurrentCardWild = subArr[i][j].value === wildcard || subArr[i][j].id === "SPADES 2" || subArr[i][j].id === "CLUBS 2";
+        if(subArr[i][count].value !== undefined && !checkCurrentCardWild) {
           let checkIfWild = subArr[i][count].value === wildcard || subArr[i][count].id === "SPADES 2" || subArr[i][count].id === "CLUBS 2";
           // finds card position in compare hand.
           let compare = valueOrder.indexOf(subArr[i][j].value);
@@ -38,16 +39,19 @@ export default function CheckIfOut(hand, wildcard) {
           }
   
           // check next value
-          if(subArr[i][count].value !== valueOrder[compare] && checkIfWild === false) return false;
+          if(subArr[i][count].value !== valueOrder[compare] && checkIfWild === false) return false
         }
         console.log(subArr)
         count++;
       }
     } else {
+      let j;
+      if(subArr[i][0].value === wildcard || subArr[i][0].id === "SPADES 2" || subArr[i][0].id === "CLUBS 2") j = 1;
+      else j = 0;
       console.log("values")
       // we are looking at the values
   
-      let sameValues = subArr[i].every(card => card.value === subArr[i][0].value)
+      let sameValues = subArr[i].every(card => card.value === subArr[i][j].value)
   
       if(!sameValues) {
         // we want to filter out wild cards
@@ -55,8 +59,8 @@ export default function CheckIfOut(hand, wildcard) {
                                      .filter(card => card.id !== "SPADES 2")
                                      .filter(card => card.id !== "CLUBS 2")
                                      
-      checkForWilds = checkForWilds.every(card => card.value === subArr[i][0].value)
-      if(!checkForWilds) return false;                
+      checkForWilds = checkForWilds.every(card => card.value === subArr[i][j].value)
+      if(!checkForWilds) return false                  
       }
     }
   }

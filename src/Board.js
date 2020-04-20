@@ -3,6 +3,7 @@ import Deck, { StartGame } from "./GetCards";
 import Player from "./Player";
 import "./Board.css";
 import CheckIfOut from "./CheckIfOut";
+import ComputersTurn from "./ComputersTurn";
 import { v4 as uuid } from 'uuid';
 export default class Board extends Component {
   constructor(props) {
@@ -22,6 +23,7 @@ export default class Board extends Component {
     this.DiscardCard = this.DiscardCard.bind(this)
     this.OrganizeHand = this.OrganizeHand.bind(this)
     this.Out = this.Out.bind(this)
+    this.GetComputersTurn = this.GetComputersTurn.bind(this)
   }
 
   componentDidMount() {
@@ -81,7 +83,7 @@ export default class Board extends Component {
           hasPickedUp: !this.state.hasPickedUp, 
           currentTurn: !this.state.currentTurn 
         }
-      )
+        )
     } else {
       this.setState({[playerHand]: player, resetRound: true})
     }
@@ -128,13 +130,14 @@ export default class Board extends Component {
     this.setState({[playerHand]: player})
   }
 
-  Out(id) {
+  Out() {
     let isValid;
-    if(id === 1) {
+    if(!this.state.currentTurn) {
       isValid = CheckIfOut(this.state.playerOneHand, this.state.currentWildCard)
     } else {
       isValid = CheckIfOut(this.state.playerTwoHand, this.state.currentWildCard)
     }
+
     if(isValid) {
       this.setState({lastMove: true})
     }
@@ -161,8 +164,12 @@ export default class Board extends Component {
         wild = "GAME FINISHED"
         break;
       default:
+        wild = number;
         break;
     }
+
+    AddScore()
+
     this.setState({
       playerOneHand: p1Hand, 
       playerTwoHand: p2Hand, 
@@ -175,6 +182,14 @@ export default class Board extends Component {
       lastMove: false,
       resetRound: false,
     });
+
+  }
+
+  AddScore() {
+    // divide hand by dividers
+    // pass each division and see if out
+    // if not out, add up cards
+    // move on to next division
   }
 
   OverwriteCard() {
@@ -194,10 +209,15 @@ export default class Board extends Component {
     this.setState({playerOneHand: playerHand})
   }
 
+  GetComputersTurn() {
+    ComputersTurn(this.state.playerTwoHand, this.state.discardPile, this.state.currentWildCard);
+  }
+
   render() {
+    if(this.state.currentTurn === false) this.GetComputersTurn();
     let nextRound;
     if(this.state.resetRound) nextRound = <button onClick={() => this.ResetRound()}>NEXT ROUND</button>
-  
+
     return (
       <div className="Board">
         <div>

@@ -1,19 +1,15 @@
 let hand = [
-  // {value: "2", suit: "SPADES", image: "./cards/JC.png", id: "SPADES 2"},
-  // {value: "10", suit: "SPADES", image: "./cards/7D.png", id: "SPADES 10"},
-  // {value: "J", suit: "SPADES", image: "./cards/KD.png", id: "SPADES J"},
-  // {id: "fbcff3c1-75e8-4796-9ae0-66d920d22c71", value: "fbcff3c1-75e8-4796-9ae0-66d920d22c71", type: "divider"},
-  {value: "K", suit: "CLUBS", image: "./cards/AS.png", id: "CLUBS K"},
-  {value: "2", suit: "CLUBS", image: "./cards/3C.png", id: "CLUBS 2"},
-  {value: "K", suit: "DIAMONDS", image: "./cards/AS.png", id: "DIAMONDS K"},
-  {value: "K", suit: "SPADES", image: "./cards/KC.png", id: "SPADES K"},
+  {value: "9", suit: "HEARTS", image: "./cards/3C.png", id: "HEARTS 9"},
+  {value: "3", suit: "HEARTS", image: "./cards/AS.png", id: "DIAMONDS 3"},
+  {value: "9", suit: "SPADES", image: "./cards/AS.png", id: "SPADES 9"},
+  // {value: "Q", suit: "DIAMONDS", image: "./cards/KC.png", id: "DIAMONDS Q"},
 ]
 
 // TO DO: TEST CASE 3, WILD CARD, INVALID
 
-const valueOrder = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
+const valueOrder = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "K", "Q"];
 
-let wildcard = "6";
+let wildcard = "3";
 
 let subArr = [], start = 0, invalid = false;
 
@@ -29,34 +25,45 @@ for(let i = 0; i < hand.length - 1; i++) {
 subArr.push(hand.slice(start, hand.length))
 
 for(let i = 0; i < subArr.length; i++) {
+
+
+  let checkForWilds = subArr[i].filter(card => card.value !== wildcard)
+                                   .filter(card => card.id !== "SPADES 2")
+                                   .filter(card => card.id !== "CLUBS 2")
+
+  console.log("---", checkForWilds)
   // create array with cards that do not have same suit as first card.
-  let check = subArr[i].every(card => card.suit === subArr[i][0].suit);
+  let check = checkForWilds.every(card => card.suit === checkForWilds[0].suit);
 
   if(check) {
     console.log("run")
     // we have a run
-    let count = 1;
-    for(let j = 0; j < subArr[i].length - 1; j++) {
-     let checkCurrentCardWild = subArr[i][j].value === wildcard || subArr[i][j].id === "SPADES 2" || subArr[i][j].id === "CLUBS 2";
-      if(subArr[i][count].value !== undefined && !checkCurrentCardWild) {
-        let checkIfWild = subArr[i][count].value === wildcard || subArr[i][count].id === "SPADES 2" || subArr[i][count].id === "CLUBS 2";
-        // finds card position in compare hand.
-        let compare = valueOrder.indexOf(subArr[i][j].value);
-        // find what the next card SHOULD BE
-        compare++;
-        
-
-        if(checkIfWild) {
-          // next card is a wild card.
-          console.log("Wild Card Found", j)
-          subArr[i][count] = {value: valueOrder[compare]}
+    if(checkForWilds.length !== check.length) {
+      // we have wild cards that need to be replaced
+     
+      for(let j = 0; j < subArr[i].length; j++) {
+        if(subArr[i][j].value === wildcard || subArr[i][j].id === "SPADES 2" || subArr[i][j].id === "CLUBS 2") {
+          let replaceWith;
+          if(j === 0) {
+            replaceWith = valueOrder.indexOf(subArr[i][j + 1].value);
+            replaceWith--
+          } else {
+            replaceWith = valueOrder.indexOf(subArr[i][j - 1].value);
+            replaceWith++;
+          }
+          // replace wild with proper card
+          subArr[i][j].value = valueOrder[replaceWith]
         }
-
-        // check next value
-        if(subArr[i][count].value !== valueOrder[compare] && checkIfWild === false) console.log(false)
       }
-      console.log(subArr)
-      count++;
+
+      let compare = valueOrder.indexOf(subArr[i][0].value)
+      
+      for(let j = 0; j < subArr[i].length; j++) {
+        // console.log(subArr[i][j].value , valueOrder[compare])
+        console.log(subArr[i][j].value, valueOrder[compare])
+        if(subArr[i][j].value !== valueOrder[compare]) console.log(false);
+        compare++
+      }
     }
   } else {
     let j;

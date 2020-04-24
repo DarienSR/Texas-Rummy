@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import Deck, { StartGame } from "./GetCards";
 import Player from "./Player";
 import "./Board.css";
-import CheckIfOut from "./CheckIfOut";
+import DivideHand, {CheckIfOut} from "./CheckIfOut";
 import ComputersTurn from "./ComputersTurn";
 import { v4 as uuid } from 'uuid';
 export default class Board extends Component {
@@ -12,6 +12,10 @@ export default class Board extends Component {
       deck: [],
       discardPile: [],
       playerOneHand: [],
+      p1Score: 0,
+      p2Score: 0,
+      p1Out: false,
+      p2Out: false,
       playerTwoHand: [],
       hasPickedUp: false,
       currentTurn: true,
@@ -37,9 +41,11 @@ export default class Board extends Component {
     
     let playerHand, player, card;
     if(this.state.currentTurn) {
+      if(this.state.p1Out) return;
       playerHand = "playerOneHand";
       player = this.state.playerOneHand;
     } else {
+      if(this.state.p2Out) return;
       playerHand = "playerTwoHand";
       player = this.state.playerTwoHand;
     }
@@ -58,13 +64,16 @@ export default class Board extends Component {
     if(id === 2 && this.state.currentTurn === true) return;
     if(!this.state.hasPickedUp || this.state.resetRound) return;
     if(selected.length > 15) return; // we know this is a uuid, not a valid card
-
+    
+    
     let playerHand, player, discarded;
-
+    
     if(id === 1) {
+      if(this.state.p1Out) return;
       playerHand = "playerOneHand";
       player = this.state.playerOneHand;
     } else {
+      if(this.state.p2Out) return;
       playerHand = "playerTwoHand";
       player = this.state.playerTwoHand;
     }
@@ -130,18 +139,23 @@ export default class Board extends Component {
     this.setState({[playerHand]: player})
   }
 
-  Out() {
+  Out(e) {
+    if(e === 1 && this.state.currentTurn) return;
+    if(e === 2 && !this.state.currentTurn) return;
+    if(this.state.resetRound) return;
     let isValid;
-    if(!this.state.currentTurn) {
-      isValid = CheckIfOut(this.state.playerOneHand, this.state.currentWildCard)
+    let player;
+    if(e === 1) {
+      isValid = CheckIfOut(DivideHand(this.state.playerOneHand),this.state.currentWildCard)
+      player = "p1Out";
     } else {
-      isValid = CheckIfOut(this.state.playerTwoHand, this.state.currentWildCard)
-    }
-
-    if(isValid) {
-      this.setState({lastMove: true})
+      isValid = CheckIfOut(DivideHand(this.state.playerTwoHand),this.state.currentWildCard)
+      player = "p2Out";
     }
     console.log(isValid)
+    if(isValid) {
+      this.setState({lastMove: true, [player]: true})
+    }
   }
 
   ResetRound() {
@@ -149,7 +163,11 @@ export default class Board extends Component {
     let deck = Deck, p1Hand = [], p2Hand = [], discard = [], wild;
     number++
     StartGame(deck, p1Hand, p2Hand, discard, number);
-    
+    let player1Score = this.Score(this.state.playerOneHand)
+    let player2Score = this.Score(this.state.playerTwoHand)
+   
+    player1Score += this.state.p1Score;
+    player2Score += this.state.p2Score;
     switch(number) {
       case 11:
         wild = "J";
@@ -168,10 +186,13 @@ export default class Board extends Component {
         break;
     }
 
-    AddScore()
-
+  
     this.setState({
       playerOneHand: p1Hand, 
+      p1Score: player1Score,
+      p2Score: player2Score,
+      p1Out: false,
+      p2Out: false,
       playerTwoHand: p2Hand, 
       discardPile: discard, 
       deck: deck,
@@ -185,11 +206,40 @@ export default class Board extends Component {
 
   }
 
-  AddScore() {
-    // divide hand by dividers
-    // pass each division and see if out
-    // if not out, add up cards
-    // move on to next division
+  Score(player) {
+    console.log("CALCULATING SCORE")
+    const divideHand = DivideHand(player)
+    let score = 0
+    divideHand.forEach((subArr) => {
+  
+      let count = CheckIfOut([subArr], this.state.currentWildCard)
+      
+      if(!count) {
+        // add up points
+        subArr.forEach((val) => {
+          console.log(val)
+          if(val.value === "A") {
+            score += 1
+            console.log("aces")
+          }
+          else if(val.value === "J" || val.value === "K" || val.value === "Q") {
+            score += 10
+            console.log("Royals")
+          }
+          else if(val.value === this.state.currentWildCard |val.value === "SPADES 2" |val.value === "CLUBS 2") {
+            score += 10
+            console.log("Wilds")
+          } 
+          else {
+            score += parseInt(val.value)
+            console.log("ORDINARY", val.value)
+          }
+          console.log(score, "updating")
+        })
+      }
+    })
+    console.log("Score final: ", score)
+    return score;
   }
 
   OverwriteCard() {
@@ -217,17 +267,20 @@ export default class Board extends Component {
     if(this.state.currentTurn === false) this.GetComputersTurn();
     let nextRound;
     if(this.state.resetRound) nextRound = <button onClick={() => this.ResetRound()}>NEXT ROUND</button>
-
+   
     return (
       <div className="Board">
         <div>
+        <h1>{this.state.p2Score}</h1>
           <Player 
-            style={!this.state.currentTurn ? {backgroundColor: "orange"} : null} 
+            style={!this.state.currentTurn ? {backgroundColor: "red"} : null} 
+            className={this.state.p2Out ? "PlayerIsOut" : null}
             Discard={this.DiscardCard} 
             id={2} 
             hand={this.state.playerTwoHand} 
             OrganizeHand={this.OrganizeHand}
             Out={this.Out}
+            wild={this.state.currentWildCard}
           />
         </div>
 
@@ -242,13 +295,16 @@ export default class Board extends Component {
         </div>
         {nextRound}
         <div>
+          <h1>{this.state.p1Score}</h1>
           <Player 
-            style={this.state.currentTurn ? {backgroundColor: "orange"} : null} 
+            style={this.state.currentTurn ? {backgroundColor: "red"} : null} 
+            isOut={this.state.p1Out}
             Discard={this.DiscardCard} 
             id={1} 
             hand={this.state.playerOneHand} 
             OrganizeHand={this.OrganizeHand}
             Out={this.Out}
+            wild={this.state.currentWildCard}
           />
         </div>
         <button onClick={() => this.OverwriteCard()}>OVERWRITE</button>

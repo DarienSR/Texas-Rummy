@@ -2,18 +2,20 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  background-color: rgb(255, 255, 255);
 }
 
 .PlayerHand {
   display: flex;
   justify-content: center;
-  background-color: rgb(192, 192, 233);
+  background-color: rgb(255, 255, 255)
 }
 
 .Board-Middle {
   display: flex;
   justify-content: center;
-  background-color: rgb(42, 42, 44);
+  padding: 1.2rem;
+  background-color: rgb(19, 18, 18);
 }
 
 .Card {
@@ -35,4 +37,8 @@
   padding: 0.5rem;
   background-color: rgb(221, 159, 159);
   width: 150px;
+}
+
+.PlayerIsOut {
+  background-color: green !important;
 }

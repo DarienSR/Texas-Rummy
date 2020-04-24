@@ -29,9 +29,11 @@ export default class Player extends Component {
 
   render() {
     return (
-      <div>        
+      <div style={this.props.isOut ? {backgroundColor: "green"} : null}>        
         <div 
-        style={this.props.style} className="PlayerHand">
+          style={this.props.style} 
+          className="PlayerHand"
+        >
           {this.props.hand.map((card) => {
             if(card.type === undefined)
               return <Card 

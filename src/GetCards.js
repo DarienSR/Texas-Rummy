@@ -1,7 +1,7 @@
 
 let deck = [
   {value: "A", suit: "SPADES", image: "./cards/AS.png"},
-  {value: "2", suit: "SPADES", image: "./cards/2S.png"},
+  {value: "2", suit: "SPADES", image: "./cards/2S.png", wild: true},
   {value: "3", suit: "SPADES", image: "./cards/3S.png"},
   {value: "4", suit: "SPADES", image: "./cards/4S.png"},
   {value: "5", suit: "SPADES", image: "./cards/5S.png"},
@@ -40,7 +40,7 @@ let deck = [
   {value: "Q", suit: "HEARTS", image: "./cards/QH.png"},
   {value: "K", suit: "HEARTS", image: "./cards/KH.png"},
   {value: "A", suit: "CLUBS", image: "./cards/AC.png"},
-  {value: "2", suit: "CLUBS", image: "./cards/2C.png"},
+  {value: "2", suit: "CLUBS", image: "./cards/2C.png", wild: true},
   {value: "3", suit: "CLUBS", image: "./cards/3C.png"},
   {value: "4", suit: "CLUBS", image: "./cards/4C.png"},
   {value: "5", suit: "CLUBS", image: "./cards/5C.png"},

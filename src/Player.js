@@ -9,6 +9,7 @@ export default class Player extends Component {
       selected: "",
       score: 0
     }
+    this.handleChangeInfo= this.handleChangeInfo.bind(this)
   }
   
   toggleDiscard() {
@@ -22,6 +23,10 @@ export default class Player extends Component {
   handleOut() {
     this.props.Out(this.props.id)
   }
+
+  handleChangeInfo(y, idx) {
+    this.props.ChangeInfo(y, idx);
+  }
   
   selectCard(selected) {
     this.setState({selected: selected})
@@ -34,7 +39,10 @@ export default class Player extends Component {
           style={this.props.style} 
           className="PlayerHand"
         >
-          {this.props.hand.map((card) => {
+          {this.props.hand.map((card, idx) => {
+            let isWild;
+
+            if(card.value == this.props.wild || card.id === "SPADES 2" || card.id === "CLUBS 2" || card.hasChanged) isWild = true;
             if(card.type === undefined)
               return <Card 
                 className="Playercard"
@@ -44,6 +52,9 @@ export default class Player extends Component {
                 suit={card.suit} 
                 value={card.value} 
                 image={card.image} 
+                isWild={isWild}
+                ChangeInfo={this.handleChangeInfo}
+                idx={idx}
               />
             else
               return <Card 

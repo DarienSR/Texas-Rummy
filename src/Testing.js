@@ -2,6 +2,7 @@ let hand = [
   {value: "9", suit: "HEARTS", image: "./cards/3C.png", id: "HEARTS 9"},
   {value: "3", suit: "HEARTS", image: "./cards/AS.png", id: "DIAMONDS 3"},
   {value: "9", suit: "SPADES", image: "./cards/AS.png", id: "SPADES 9"},
+  {value: "9", suit: "SPADES", image: "./cards/AS.png", id: "SPADES 9"},
   // {value: "Q", suit: "DIAMONDS", image: "./cards/KC.png", id: "DIAMONDS Q"},
 ]
 

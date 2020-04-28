@@ -1,0 +1,21 @@
+.Card-Wild {
+  display: flex;
+  flex-direction: column;
+}
+
+.Card-Wild input {
+  max-width: 100px;
+  margin: 0 auto;
+}
+
+.Card {
+  padding: 2px;
+  margin: 5px;
+  height: 250px;
+  width: 175px;
+}
+
+.Card-Wild {
+  background-color: rgb(104, 104, 173);
+  margin: 2px;
+}

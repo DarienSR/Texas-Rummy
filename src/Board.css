@@ -18,12 +18,6 @@
   background-color: rgb(19, 18, 18);
 }
 
-.Card {
-  padding: 2px;
-  margin: 5px;
-  height: 250px;
-  width: 175px;
-}
 
 
 .Player-Controls {
@@ -41,4 +35,58 @@
 
 .PlayerIsOut {
   background-color: green !important;
+}
+
+.Board-Details {
+  display: flex;
+  flex-direction: column;
+  margin: 2rem;
+}
+
+.Board-Score {
+  display: flex;
+  justify-content: space-between;
+}
+
+.HowToPlay {
+  width: 5%;
+  align-self: flex-end;
+  font-size: 3rem;
+  border: none;
+  background: none;
+}
+
+.HowToPlay:hover {
+  cursor: pointer;
+}
+
+.Popup-Box {
+  color: rgb(238, 201, 201);
+  font-size: 1.2rem;
+  position: absolute;
+  background-color: rgb(17, 16, 16);
+  z-index: 5;
+  margin: 0 auto;
+  left: 25%;
+  top: 20%;
+  width: 50%;
+  height: 50%;
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  border-radius: 2%;
+}
+
+.Popup-Box-Header {
+  color: rgb(238, 201, 201);
+  letter-spacing: 5px;
+}
+
+.Popup-Box-Details {
+  position: absolute;
+  top: 10%;
+  right: 90%;
+  font-size: 1.2rem;
+  left: 4%;
+  width: 80%;
 }

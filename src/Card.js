@@ -17,15 +17,14 @@ export default class Card extends Component {
   }
 
   handleChange(e) {
-    
     this.props.ChangeInfo(e.target.value, this.props.idx)
   }
 
   render() {
-
     let cardPreview = this.props.isWild ? 
       <div className="Card-Wild">
         <img 
+          alt={this.props.id}
           onClick={() => this.props.type !== "divider" ? this.toggleCard(`${this.props.suit} ${this.props.value}`) : this.toggleCard(this.props.value)} 
           style={this.props.style}
           className="Card Card-Wild" 
@@ -40,7 +39,7 @@ export default class Card extends Component {
         </select>
         <select onChange={this.handleChange}>
           <option value={this.props.value}>{this.props.value}</option>
-          <option>1</option>
+          <option>A</option>
           <option>2</option>
           <option>3</option>
           <option>4</option>
@@ -58,14 +57,13 @@ export default class Card extends Component {
     :
       <div>
         <img 
+          alt={this.props.id}
           onClick={() => this.props.type !== "divider" ? this.toggleCard(`${this.props.suit} ${this.props.value}`) : this.toggleCard(this.props.value)} 
           style={this.props.style}
           className="Card" 
           src={this.props.image} 
         />
       </div>
-
-
     return (
       cardPreview
     )

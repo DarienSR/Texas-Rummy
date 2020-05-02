@@ -79,7 +79,7 @@ console.log(number)
   // add one card to discard pile
   discard.push(deck.shift());
 
-  return deck, p1Hand, p2Hand, discard;
+  return [deck, p1Hand, p2Hand, discard];
 }
 
 function shuffle(arr) {

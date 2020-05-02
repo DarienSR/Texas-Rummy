@@ -5,10 +5,13 @@ import "./Board.css";
 import DivideHand, {CheckIfOut} from "./CheckIfOut";
 import { v4 as uuid } from 'uuid';
 import Popup from "./Popup"
-import Card from "./Card"
 import cardBack from "./blue_back.png";
-
+import cardWoosh from "./cardWoosh.wav"
+import switchSound from "./switch.wav"
 export default class Board extends Component {
+
+
+
   constructor(props) {
     super(props)
     this.state = {
@@ -31,10 +34,10 @@ export default class Board extends Component {
     this.OrganizeHand = this.OrganizeHand.bind(this)
     this.Out = this.Out.bind(this)
     this.OverwriteWild = this.OverwriteWild.bind(this)
+    this.woosh = new Audio(cardWoosh);
+    this.switchTurn = new Audio(switchSound);
   }
-
- 
-
+  
   componentWillMount() {
     let deck = Deck, p1Hand = [], p2Hand = [], discard = [];
     StartGame(deck, p1Hand, p2Hand, discard, this.state.currentHand);
@@ -54,7 +57,8 @@ export default class Board extends Component {
       playerHand = "playerTwoHand";
       player = this.state.playerTwoHand;
     }
-    
+   
+    this.woosh.play()  
     if(fromDiscard) {
       card = this.state.discardPile.pop();
       this.setState({[playerHand]: [...player, card], hasPickedUp: !this.state.hasPickedUp, discardPile: [...this.state.discardPile]});
@@ -86,9 +90,9 @@ export default class Board extends Component {
     player.forEach((card, i) => {
       if(card.id === selected) discarded = player.splice(i, 1);
     });
-
     if(discarded === undefined) return;
-
+    
+    this.switchTurn.play()
     if(!this.state.lastMove) {
       this.setState(
         {
@@ -145,9 +149,6 @@ export default class Board extends Component {
   }
 
   Out(e) {
-    // if(e === 1 && !this.state.currentTurn) return;
-    // if(e === 2 && this.state.currentTurn) return;
-    console.log('ddd')
     if(this.state.resetRound) return;
     let isValid;
     let player;
@@ -249,6 +250,7 @@ export default class Board extends Component {
   }
 
   OverwriteCard() {
+    // for developer use
     let idx = prompt();
     let value = prompt();
     let suit = prompt();
@@ -267,6 +269,7 @@ export default class Board extends Component {
 
   OverwriteWild(x, idx) {
     let person, player;
+    if(this.state.resetRound) return;
     if(this.state.currentTurn) {
       person = "playerOneHand";
       player = this.state.playerOneHand;
@@ -302,42 +305,12 @@ export default class Board extends Component {
    render() {
     let nextRound;
     if(this.state.resetRound) nextRound = <button onClick={() => this.ResetRound()}>NEXT ROUND</button>
-    
-    let cardDiscard = this.state.discardPile[this.state.discardPile.length - 1], isWild;
+    if(this.state.p1Out && this.state.p2Out && !this.state.resetRound) this.setState({resetRound: true})
+    //let cardDiscard = this.state.discardPile[this.state.discardPile.length - 1], 
+    let isWild;
 
-    //if(cardDiscard.value === this.state.currentWildCard || cardDiscard.id === "SPADES 2" || cardDiscard.id === "CLUBS 2") isWild = true;
-    let showP1 = this.state.currentTurn ? <Player 
-                                            style={this.state.currentTurn ? {backgroundColor: "red"} : null} 
-                                            isOut={this.state.p1Out}
-                                            Discard={this.DiscardCard} 
-                                            id={1} 
-                                            hand={this.state.playerOneHand} 
-                                            OrganizeHand={this.OrganizeHand}
-                                            Out={this.Out}
-                                            wild={this.state.currentWildCard}
-                                            ChangeInfo={this.OverwriteWild} />
-    : this.state.playerOneHand.map(() => {
-      return <Card image={cardBack} className="Playercard" />
-    });
-
-    let showP2 = !this.state.currentTurn ? <Player 
-                                              style={!this.state.currentTurn ? {backgroundColor: "red"} : null} 
-                                              className={this.state.p2Out ? "PlayerIsOut" : null}
-                                              Discard={this.DiscardCard} 
-                                              id={2} 
-                                              hand={this.state.playerTwoHand} 
-                                              OrganizeHand={this.OrganizeHand}
-                                              Out={this.Out}
-                                              wild={this.state.currentWildCard}
-                                              ChangeInfo={this.OverwriteWild}
-                                            />
-    : this.state.playerTwoHand.map(() => {
-      return <Card image={cardBack} className="Playercard" />
-    })         
-    
-    if(this.state.resetRound) {
-      showP1 =  <Player 
-      style={this.state.currentTurn ? {backgroundColor: "red"} : null} 
+    let primaryPlayer = <Player 
+      style={this.state.currentTurn ? {backgroundColor: "whitesmoke"} : null} 
       isOut={this.state.p1Out}
       Discard={this.DiscardCard} 
       id={1} 
@@ -347,8 +320,8 @@ export default class Board extends Component {
       wild={this.state.currentWildCard}
       ChangeInfo={this.OverwriteWild} />
 
-      showP2 = <Player 
-      style={!this.state.currentTurn ? {backgroundColor: "red"} : null} 
+    let secondaryPlayer = <Player 
+      style={!this.state.currentTurn ? {backgroundColor: "whitesmoke"} : null} 
       className={this.state.p2Out ? "PlayerIsOut" : null}
       Discard={this.DiscardCard} 
       id={2} 
@@ -356,14 +329,28 @@ export default class Board extends Component {
       OrganizeHand={this.OrganizeHand}
       Out={this.Out}
       wild={this.state.currentWildCard}
-      ChangeInfo={this.OverwriteWild}
-     />
+      ChangeInfo={this.OverwriteWild} />
+
+    //if(cardDiscard.value === this.state.currentWildCard || cardDiscard.id === "SPADES 2" || cardDiscard.id === "CLUBS 2") isWild = true;
+    let showP1 = this.state.currentTurn ? primaryPlayer
+    : this.state.playerOneHand.map(() => {
+      return <img alt="Back of Card" src={cardBack} className="Playercard Card" />
+    });
+
+    let showP2 = !this.state.currentTurn ? secondaryPlayer
+    : this.state.playerTwoHand.map(() => {
+      return <img alt="Back of Card" src={cardBack} className="Playercard Card" />
+    })         
+    
+    if(this.state.resetRound) {
+      showP1 =  primaryPlayer
+      showP2 = secondaryPlayer
     }
 
     return (
       <div className="Board">
         <div className="Board-Details">
-          <button onClick={() => Popup()} className="HowToPlay">?</button>
+          <button onClick={() => Popup()} title="How To Play" className="HowToPlay">?</button>
           <div style={{visibility: "hidden"}} className="Popup-Box">
             <h1 className="Popup-Box-Header">Texas Rummy</h1>
             <p className="Popup-Box-Details">Starting with 3 cards and making your way to the final round (13 cards), you must try and go out, if not, try to score as little points as possible. Points are scored based on their value. A = 1 | J, K, Q, Wild Cards = 10<br></br><br></br>
@@ -384,14 +371,16 @@ export default class Board extends Component {
         </div>
 
         <div className="Board-Middle">
-          <button onClick={() => this.PickUpCard(true)} >
+          <button className="Deck" onClick={() => this.PickUpCard(true)} >
             <img className="Card"
               alt="Discard Pile"
               src={this.state.discardPile[0] ? this.state.discardPile[this.state.discardPile.length - 1].image : null} 
               style={isWild ? {backgroundColor: "purple"} : null}
             />
           </button>
-          <button className="Card" onClick={() => this.PickUpCard()}></button>
+          <button className="Deck" onClick={() =>  { this.PickUpCard()}}>
+            <img alt="Back of Card" className="Card" src={cardBack}/>
+          </button>
         </div>
 
         {nextRound}

@@ -8,7 +8,7 @@
 .PlayerHand {
   display: flex;
   justify-content: center;
-  background-color: rgb(255, 255, 255)
+  background-color: rgb(255, 255, 255);
 }
 
 .Board-Middle {
@@ -68,13 +68,14 @@
   z-index: 5;
   margin: 0 auto;
   left: 25%;
-  top: 20%;
+  top: 29%;
   width: 50%;
   height: 50%;
   display: flex;
   justify-content: center;
   flex-direction: row;
   border-radius: 2%;
+  overflow: scroll;
 }
 
 .Popup-Box-Header {
@@ -84,9 +85,24 @@
 
 .Popup-Box-Details {
   position: absolute;
-  top: 10%;
+  top: 20%;
   right: 90%;
   font-size: 1.2rem;
   left: 4%;
   width: 80%;
+  font-size: 1.2rem;
+}
+
+.Deck {
+  margin: 2rem;
+  padding: 0;
+  border: none;
+  border-radius: 8%;
+  background-color: rgba(255, 255, 255, 0.712);
+  outline: none;
+  cursor: pointer;
+}
+
+.Deck:active {
+  outline: none;
 }

@@ -19,3 +19,7 @@
   background-color: rgb(104, 104, 173);
   margin: 2px;
 }
+
+.Card:hover {
+  cursor: pointer;
+}

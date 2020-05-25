@@ -6,7 +6,7 @@ import DivideHand, {CheckIfOut} from "./CheckIfOut";
 import { v4 as uuid } from 'uuid';
 import Popup from "./Popup"
 import cardBack from "./blue_back.png";
-import cardWoosh from "./cardWoosh.wav"
+//import cardWoosh from "./cardWoosh.wav"
 export default class Board extends Component {
 
 
@@ -33,7 +33,7 @@ export default class Board extends Component {
     this.OrganizeHand = this.OrganizeHand.bind(this)
     this.Out = this.Out.bind(this)
     this.OverwriteWild = this.OverwriteWild.bind(this)
-    this.woosh = new Audio(cardWoosh);
+    //this.woosh = new Audio(cardWoosh);
   }
   
   componentWillMount() {
@@ -56,7 +56,7 @@ export default class Board extends Component {
       player = this.state.playerTwoHand;
     }
    
-    this.woosh.play()  
+    //this.woosh.play()  
     if(fromDiscard) {
       card = this.state.discardPile.pop();
       this.setState({[playerHand]: [...player, card], hasPickedUp: !this.state.hasPickedUp, discardPile: [...this.state.discardPile]});
@@ -384,7 +384,7 @@ export default class Board extends Component {
         <div style={this.state.p1Out ? {backgroundColor: "green"} : null} className="PlayerHand">
           {showP1}
         </div>
-        <button onClick={() => this.OverwriteCard()}>OVERWRITE</button>
+        {/* <button onClick={() => this.OverwriteCard()}>OVERWRITE</button> */}
       </div>
     )
   }

@@ -7,7 +7,6 @@ import { v4 as uuid } from 'uuid';
 import Popup from "./Popup"
 import cardBack from "./blue_back.png";
 import cardWoosh from "./cardWoosh.wav"
-import switchSound from "./switch.wav"
 export default class Board extends Component {
 
 
@@ -35,7 +34,6 @@ export default class Board extends Component {
     this.Out = this.Out.bind(this)
     this.OverwriteWild = this.OverwriteWild.bind(this)
     this.woosh = new Audio(cardWoosh);
-    this.switchTurn = new Audio(switchSound);
   }
   
   componentWillMount() {
@@ -92,7 +90,6 @@ export default class Board extends Component {
     });
     if(discarded === undefined) return;
     
-    this.switchTurn.play()
     if(!this.state.lastMove) {
       this.setState(
         {
@@ -353,9 +350,9 @@ export default class Board extends Component {
           <button onClick={() => Popup()} title="How To Play" className="HowToPlay">?</button>
           <div style={{visibility: "hidden"}} className="Popup-Box">
             <h1 className="Popup-Box-Header">Texas Rummy</h1>
-            <p className="Popup-Box-Details">Starting with 3 cards and making your way to the final round (13 cards), you must try and go out, if not, try to score as little points as possible. Points are scored based on their value. A = 1 | J, K, Q, Wild Cards = 10<br></br><br></br>
+            <p className="Popup-Box-Details">Starting with 3 cards and making your way to the final round (13 cards), you must try and go out, if not, try to score as little points as possible. Points are scored based on their value. A = 1 | J, K, Q, Wild Cards = 10<br></br>
 
-            There are two ways to go out. (1) Collect the same suit (ex. Clubs) and for a run (ex. A, 2, 3). Or collect differnt suits of the same value (ex. Clubs Q, Diamonds Q, Hearts, Q). If you have different card groups (i.e, 6 total cards, 3 of which are in a run, the other 3 are same suit, different values), you can add a divider between them to seperate them. When you think you are out, click the out button, which will change your side to green if successful.<br></br><br></br>
+            There are two ways to go out. (1) Collect the same suit (ex. Clubs) and for a run (ex. A, 2, 3). Or collect differnt suits of the same value (ex. Clubs Q, Diamonds Q, Hearts, Q). If you have different card groups (i.e, 6 total cards, 3 of which are in a run, the other 3 are same suit, different values), you can add a divider between them to seperate them. When you think you are out, click the out button, which will change your side to green if successful.<br></br>
 
             The two of clubs and spades are ALWAYS wild. The correlating card for each round is also considered wild. For instance, when you have 3 cards in your hand, 3's are wild. If you have 13 cards, Q's are wild. This is denoted by the card having a blue blackground and input fields.
             </p>
